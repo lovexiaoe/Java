@@ -7,6 +7,27 @@ package zhaoyu.DataStructures.Stacks;
  */
 public class NodeStack <T>{
 
+    public static void main(String[] args) {
+        NodeStack<Integer> Stack = new NodeStack<>();
+
+        Stack.push(3);
+        Stack.push(4);
+        Stack.push(5);
+        System.out.println("Testing :");
+        Stack.print(); // prints : 5 4 3
+
+        Integer x = Stack.pop(); // x = 5
+        Stack.push(1);
+        Stack.push(8);
+        Integer y = Stack.peek(); // y = 8
+        System.out.println("Testing :");
+        Stack.print(); // prints : 8 1 4 3
+
+        System.out.println("Testing :");
+        System.out.println("x : " + x);
+        System.out.println("y : " + y);
+    }
+
     private Node head;
     private int size;
 
@@ -34,7 +55,7 @@ public class NodeStack <T>{
         size++;
     }
 
-    public T pull(){
+    public T pop(){
         if (size <1) {
             throw new NullPointerException("栈已经为空");
         }
@@ -42,5 +63,18 @@ public class NodeStack <T>{
         head = head.next;
         size--;
         return (T) oldHead.element;
+    }
+
+    public T peek() {
+        return (T) head.element;
+    }
+
+    public void print(){
+        Node current=head;
+        while (current != null) {
+            System.out.print(current.element);
+            current=current.next;
+        }
+        System.out.println();
     }
 }
