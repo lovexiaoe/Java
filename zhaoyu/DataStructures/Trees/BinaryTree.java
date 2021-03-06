@@ -1,5 +1,6 @@
 package zhaoyu.DataStructures.Trees;
 
+import java.util.Stack;
 import java.util.function.Consumer;
 
 /**
@@ -10,11 +11,11 @@ import java.util.function.Consumer;
  */
 public class BinaryTree <E>{
     static class Node<E> {
-        private E value;
-        private Node<E> left;
-        private Node<E> right;
-        private Node<E> parent;
-        private BinaryTree<E> containerTree;
+        protected E value;
+        protected Node<E> left;
+        protected Node<E> right;
+        protected Node<E> parent;
+        protected BinaryTree<E> containerTree;
 
         public Node(Node<E> parent,BinaryTree<E> containerTree,E value) {
             this.value=value;
@@ -25,9 +26,19 @@ public class BinaryTree <E>{
         public E getValue(){
             return value;
         }
+
+        protected Node<E> getLeft(){
+            return left;
+        }
+
+        protected Node<E> getRight(){
+            return right;
+        }
+
+        protected Node<E> getParent(){ return parent;}
     }
 
-    private Node<E> root;
+    protected Node<E> root;
 
     public void addRoot(E value){
         root = new Node<>(null, this, value);
@@ -101,6 +112,156 @@ public class BinaryTree <E>{
         }
     }
 
+    /**
+     * 非递归深度先序遍历，先序遍历最简单，中序和后序遍历有一些复杂。
+     */
+    public void traversePreOrderNonRecursive(Consumer<E> consumer){
+        Stack<Node<E>> stack = new Stack<>();
+        stack.push(getRoot());
+        while (!stack.isEmpty()) {
+            Node<E> current=stack.pop();
+            consumer.accept(current.getValue());
+            if (current.right != null) {
+                stack.push(current.right);
+            }
+            if (current.left != null) {
+                stack.push(current.left);
+            }
+        }
+    }
+
+    /**
+     * 非递归深度中序遍历，中序遍历需要先处理子节点，只有处理了子节点后，才能处理父节点，我们用一个flag标记它的子节点是否被加入到栈中。
+     * 这样，从根节点开始处理，每个节点会被加入到栈中两次，第一次是flag为false，处理一次后，变为true再次添加到队列中。队列在下次pop后
+     * 检测到标记为true的，就会进行处理。
+     */
+    public void traverseInOrderNonRecursive(Consumer<E> consumer){
+        /**
+         * 给节点添加一个标记，作为栈中存储对象
+         */
+        class StackFame{
+            Node<E> node;
+            /**
+             * 子节点是否被加入栈中的标记。
+             */
+            boolean childrenPushed=false;
+
+            public StackFame(Node<E> node, boolean childrenPushed) {
+                this.node = node;
+                this.childrenPushed = childrenPushed;
+            }
+        }
+
+        Stack<StackFame> stack=new Stack<>();
+        stack.push(new StackFame(getRoot(), false));
+        while (!stack.isEmpty()) {
+            StackFame current=stack.pop();
+            if (current.childrenPushed) {
+                consumer.accept(current.node.getValue());
+            } else {
+                if (current.node.right != null) {
+                    stack.push(new StackFame(current.node.right, false));
+                }
+                stack.push(new StackFame(current.node, true));
+                if (current.node.left != null) {
+                    stack.push(new StackFame(current.node.left, false));
+                }
+            }
+        }
+    }
+
+    /**
+     * 非递归后续遍历，和中序遍历类似
+     * @param consumer
+     */
+    public void traversePostOrderNonRecursive(Consumer<E> consumer){
+        /**
+         * 给节点添加一个标记，作为栈中存储对象
+         */
+        class StackFame{
+            Node<E> node;
+            /**
+             * 子节点是否被加入栈中的标记。
+             */
+            boolean childrenPushed=false;
+
+            public StackFame(Node<E> node, boolean childrenPushed) {
+                this.node = node;
+                this.childrenPushed = childrenPushed;
+            }
+        }
+
+        Stack<StackFame> stack=new Stack<>();
+        stack.push(new StackFame(getRoot(), false));
+        while (!stack.isEmpty()) {
+            StackFame current=stack.pop();
+            if (current.childrenPushed) {
+                consumer.accept(current.node.getValue());
+            } else {
+                stack.push(new StackFame(current.node, true));
+                if (current.node.right != null) {
+                    stack.push(new StackFame(current.node.right, false));
+                }
+                if (current.node.left != null) {
+                    stack.push(new StackFame(current.node.left, false));
+                }
+            }
+        }
+    }
+
+    /**
+     * 修改节点的值
+     * @param node
+     * @param value
+     * @return void
+     */
+    public void setValue(Node<E> node,E value){
+        if(node==null){
+            throw new NullPointerException("操作节点为空。");
+        } else if (node.containerTree != this) {
+            throw new IllegalArgumentException("父节点不属于当前树");
+        } else {
+            node.value=value;
+        }
+    }
+
+    protected void rotate(Node<E> node,boolean left){
+        if (node == null) {
+            throw new IllegalArgumentException("操作节点为空");
+        } else if (node.containerTree != this) {
+            throw new IllegalArgumentException("节点不属于当前树");
+        }
+        Node<E> child=null;
+        Node<E> grandchild=null;
+        Node<E> parent=node.getParent();
+        boolean parentDirection;
+    }
+
+    /**
+     * 用一个节点的子节点代替该节点，使用与节点只有左子树或者右子树的情况。
+     * @param parent 节点的父节点
+     * @param child 节点的子树节点。
+     * @param left 节点是否是父节点的左节点。
+     * @return zhaoyu.DataStructures.Trees.BinaryTree.Node<E>
+     */
+    public Node<E> setChild(Node<E> parent,Node<E> child,boolean left){
+        if (parent == null) {
+            throw new NullPointerException("未找到父节点");
+        } else if (parent.containerTree != this) {
+            throw new IllegalArgumentException("父节点不是当前树节点");
+        } else {
+            if (left) {
+                parent.left = child;
+            } else {
+                parent.right=child;
+            }
+            if (child != null) {
+                child.parent=parent;
+            }
+            return child;
+        }
+    }
+
     public static void main(String[] args) {
         BinaryTree<Integer> tree = new BinaryTree<>();
         tree.addRoot(1);
@@ -125,6 +286,14 @@ public class BinaryTree <E>{
 
         tree.traverseDepthFirst(System.out::print, tree.getRoot(),
                 DepthFirstTraversalType.POSTORDER);
+        System.out.println();
+        System.out.println();
+
+        tree.traversePreOrderNonRecursive(x-> System.out.print(""+x));
+        System.out.println();
+        tree.traverseInOrderNonRecursive(x-> System.out.print(""+x));
+        System.out.println();
+        tree.traversePostOrderNonRecursive(x-> System.out.print(x));
         System.out.println();
     }
 }

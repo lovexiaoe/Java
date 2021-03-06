@@ -89,7 +89,7 @@ public class Tree<E> {
         //先将根节点放入栈中
         stack.push(getRoot());
         while (stack.peek() != null) {
-            //pop一个节点，处理这个节点，如果这个几点有子节点，那么将子节点放入栈中。循环直到所有的节点处理完成。
+            //pop一个节点，处理这个节点，如果这个节点有子节点，那么将子节点放入栈中。循环直到所有的节点处理完成。
             Node<E> current = stack.pop();
             consumer.accept(current.value);
 

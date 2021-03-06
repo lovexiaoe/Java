@@ -1,27 +1,11 @@
 package zhaoyu.DataStructures.Trees;
 
 /**
- * @Description: 平衡二叉树，也称为AVL
+ * @Description: AVL是一种平衡二叉搜索树。旋转（rotate）不会破会二叉搜索树的特性，AVL就是通过旋转保证AVL的平衡。
  * @Author: zhaoyu
  * @Date: 2021/1/26
  */
-public class AVLTree {
+public class AVLTree <E>{
 
-    class Node{
-        private int key;
-        private Node left;
-        private Node right;
-        private Node parent;
 
-        public Node(int key,Node p) {
-            this.key=key;
-            this.parent=p;
-        }
-    }
-
-    private Node root;
-
-    public void insert(int key){
-
-    }
 }
