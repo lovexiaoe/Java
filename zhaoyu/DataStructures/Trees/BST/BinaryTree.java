@@ -1,4 +1,4 @@
-package zhaoyu.DataStructures.Trees;
+package zhaoyu.DataStructures.Trees.BST;
 
 import java.util.Stack;
 import java.util.function.Consumer;
@@ -10,7 +10,7 @@ import java.util.function.Consumer;
  * @Date: 2021/1/27
  */
 public class BinaryTree <E>{
-    static class Node<E> {
+    protected static class Node<E> {
         protected E value;
         protected Node<E> left;
         protected Node<E> right;
@@ -27,15 +27,15 @@ public class BinaryTree <E>{
             return value;
         }
 
-        protected Node<E> getLeft(){
+        public Node<E> getLeft(){
             return left;
         }
 
-        protected Node<E> getRight(){
+        public Node<E> getRight(){
             return right;
         }
 
-        protected Node<E> getParent(){ return parent;}
+        public Node<E> getParent(){ return parent;}
     }
 
     protected Node<E> root;
@@ -225,24 +225,115 @@ public class BinaryTree <E>{
         }
     }
 
+    /**
+     * 二叉树的旋转操作。
+     * @param node
+     * @param left
+     * @return void
+     */
     protected void rotate(Node<E> node,boolean left){
         if (node == null) {
             throw new IllegalArgumentException("操作节点为空");
         } else if (node.containerTree != this) {
             throw new IllegalArgumentException("节点不属于当前树");
         }
+        //用于作为根的子节点
         Node<E> child=null;
+        //需要移动的中间孙子节点。
         Node<E> grandchild=null;
+        //父节点
         Node<E> parent=node.getParent();
+        //旋转节点在父节点中是左节点还是右节点。
         boolean parentDirection;
+
+        //分左右初始化子节点和中间孙子节点。
+        if (left) {
+            child = node.getRight();
+            if (child != null) {
+                grandchild = child.getLeft();
+            }
+        } else {
+            child=node.getLeft();
+            if (child != null) {
+                grandchild=child.getRight();
+            }
+        }
+        if (node != getRoot()) {
+            //判断node在父节点中的方向
+            if (parent.getLeft() == node) {
+                parentDirection = true;
+            } else {
+                parentDirection = false;
+            }
+            //从下到上删除旧关系。
+            if (grandchild != null) {
+                deleteNodeWithSubtree(grandchild);
+            }
+            if (child != null) {
+                deleteNodeWithSubtree(child);
+            }
+            deleteNodeWithSubtree(node);
+            //从上到下建立新关系
+            if (child != null) {
+                setChild(parent, child, parentDirection);
+                setChild(child, node, left);
+            }
+            if (grandchild != null) {
+                setChild(node, grandchild, !left);
+            }
+        } else {
+            //从下到上删除旧关系。
+            if (grandchild != null) {
+                deleteNodeWithSubtree(grandchild);
+            }
+            if (child != null) {
+                deleteNodeWithSubtree(child);
+            }
+            deleteNodeWithSubtree(node);
+            //从上到下建立新关系
+            if (child != null) {
+                root=child;
+                setChild(child, node, left);
+            }
+            if (grandchild != null) {
+                setChild(node, grandchild, !left);
+                root.parent=null;
+            }
+        }
     }
 
     /**
-     * 用一个节点的子节点代替该节点，使用与节点只有左子树或者右子树的情况。
+     * 删除没有子节点的节点。
+     * @param node
+     * @return void
+     */
+    public void deleteNodeWithSubtree(Node<E> node){
+        if (node == null) {
+            throw new NullPointerException("父节点为空，不能删除");
+        } else if (node.containerTree != this) {
+            throw new IllegalArgumentException("节点不属于当前树");
+        } else {
+            if (node == getRoot()) {
+                root = null;
+                return;
+            } else {
+                Node<E> parent=node.getParent();
+                if (parent.getLeft() == node) {
+                    parent.left = null;
+                } else {
+                    parent.right= null;
+                }
+            }
+        }
+
+    }
+
+    /**
+     * 用一个节点的子节点代替该节点，适用于节点只有左子树或者右子树的情况。
      * @param parent 节点的父节点
      * @param child 节点的子树节点。
      * @param left 节点是否是父节点的左节点。
-     * @return zhaoyu.DataStructures.Trees.BinaryTree.Node<E>
+     * @return zhaoyu.DataStructures.Trees.BST.BinaryTree.Node<E>
      */
     public Node<E> setChild(Node<E> parent,Node<E> child,boolean left){
         if (parent == null) {

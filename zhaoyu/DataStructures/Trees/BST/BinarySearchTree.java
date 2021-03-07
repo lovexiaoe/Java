@@ -1,11 +1,11 @@
-package zhaoyu.DataStructures.Trees;
+package zhaoyu.DataStructures.Trees.BST;
 
 /**
  * 二叉搜索树
  * 在一个有序队列中，二分法查找扩展到所有元素，就会形成一个二叉搜索树。参考binary-search-tree.png。
  * @param <E>
  */
-public class BinarySearchTree<E extends Comparable<E>> extends BinaryTree<E>{
+public class BinarySearchTree<E extends Comparable<E>> extends BinaryTree<E> {
     protected Node<E> searchValue(E value,Node<E> root){
         if (root == null) {
             return null;
@@ -23,7 +23,7 @@ public class BinarySearchTree<E extends Comparable<E>> extends BinaryTree<E>{
     /**
      * 查找值，不存在，返回null。
      * @param value
-     * @return zhaoyu.DataStructures.Trees.BinaryTree.Node<E>
+     * @return zhaoyu.DataStructures.Trees.BST.BinaryTree.Node<E>
      */
     public Node<E> searchValue(E value){
         if (getRoot() == null) {
@@ -72,36 +72,18 @@ public class BinarySearchTree<E extends Comparable<E>> extends BinaryTree<E>{
         }
     }
 
-    /**
-     * 删除没有子节点的节点。
-     * @param node
-     * @return void
-     */
-    public void deleteNodeWithSubtree(Node<E> node){
+    public Node<E> deleteValue(E value) {
+        Node node = searchValue(value);
         if (node == null) {
-            throw new NullPointerException("父节点为空，不能删除");
-        } else if (node.containerTree != this) {
-            throw new IllegalArgumentException("节点不属于当前树");
-        } else {
-            if (node == getRoot()) {
-                root = null;
-                return;
-            } else {
-                Node<E> parent=node.getParent();
-                if (parent.getLeft() == node) {
-                    parent.left = null;
-                } else {
-                    parent.right= null;
-                }
-            }
+            return null;
         }
-
+        return deleteNode(node);
     }
 
     /**
      * 从树种删除任意节点。
      * @param delNode
-     * @return zhaoyu.DataStructures.Trees.BinaryTree.Node<E>
+     * @return zhaoyu.DataStructures.Trees.BST.BinaryTree.Node<E>
      */
     private Node<E> deleteNode(Node<E> delNode){
         boolean left;
@@ -149,9 +131,9 @@ public class BinarySearchTree<E extends Comparable<E>> extends BinaryTree<E>{
     }
 
     /**
-     * 查找一个子树的最小节点并返回。
+     * 查找一个子树的最左节点并返回。
      * @param node
-     * @return zhaoyu.DataStructures.Trees.BinaryTree.Node<E>
+     * @return zhaoyu.DataStructures.Trees.BST.BinaryTree.Node<E>
      */
     protected Node<E> getLeftMost(Node<E> node){
         if (node == null) {
